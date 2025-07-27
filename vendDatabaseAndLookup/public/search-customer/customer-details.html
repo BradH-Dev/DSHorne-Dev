@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Details</title>
+    <link rel="stylesheet" href="/shared/styles/search-pages.css">
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/shared/styles/base.css">
+    <link rel="stylesheet" href="/shared/styles/buttons.css">
+    <link rel="stylesheet" href="/shared/styles/modals.css">
+    <link rel="stylesheet" href="/shared/styles/tables.css">
+    <link rel="stylesheet" href="/shared/styles/typography.css">
+
+    <!-- Include jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+
+    <!-- Include AutoTable Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
+
+</head>
+<body>
+    <div id="customerInfo">
+        <!-- Customer details will be dynamically inserted here -->
+    </div>
+    <div id = "backToHomeContainer" style="justify-self: center; position: sticky; top: 0; z-index: 999998;">
+        <button id="backToHomeButton" class="button">Back to search</button>
+        <br><br>
+    </div>
+    
+    <h2>Customer Sales</h2>
+    <table id="salesTable">
+        <thead>
+            <tr>
+                <th>Sale Date</th>
+                <th>Invoice Number</th>
+                <th>Receipt Number</th>
+                <th>Sale Status</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Sales data will be dynamically inserted here -->
+        </tbody>
+    </table>
+
+    <!-- Popup modal for sales line items -->
+    <div id="lineItemsModal" class="modal" style="z-index: 999999">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Sale Line Items</h2>
+            <table class="customer-details-table">
+                <tr>
+                    <th>Date of Sale</th>
+                    <td id="saleDate">Unknown date</td>
+                </tr>
+                <tr>
+                    <th>Invoice Number</th>
+                    <td id="invoiceNum">Unknown invoice number</td>
+                </tr>
+                <tr>
+                    <th>Receipt Number</th>
+                    <td id="receiptNum">Unknown receipt number</td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td id="saleStatus">Unknown status</td>
+                </tr>
+            </table>
+            <table id="lineItemsTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price per</th>
+                        <th>GST per</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Line items will be inserted here -->
+                </tbody>
+                <button id="generatePdfButton" class="button">Generate invoice PDF</button>
+            </table>
+            <div id="paymentDetails"></div>
+            <br></br>
+            <button id="closeModalButton" class="button">OK (or click anywhere outside this window)</button>
+        </div>
+    </div>
+
+    <script type="module" src="/search-customer/customer-details.js"></script>
+</body>
+</html>

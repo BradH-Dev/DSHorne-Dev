@@ -1,0 +1,65 @@
+table {
+    width: 65vw;
+    margin: 20px auto;
+    border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #e9e9e9;
+}
+
+#salesTable tbody tr:hover {
+    cursor: pointer;
+}
+
+
+.customer-details-table {
+    width: 100%; /* Adjust width as needed */
+    margin-top: 20px; /* Space above the table */
+    border-collapse: collapse; /* Ensures that the borders are neat */
+    box-shadow: 0 2px 15px rgba(0, 0, 255, 0.2); /* Subtle blue shadow */
+    font-family: Arial, sans-serif; /* Font consistency */
+}
+
+.customer-details-table th, .customer-details-table td {
+    border: 1px solid #ccc; /* Light grey border for readability */
+    padding: 10px; /* Padding inside cells */
+    text-align: left; /* Align text to the left */
+}
+
+.customer-details-table th {
+    background-color: #e1f5fe; /* Light blue background for headers */
+    color: #333; /* Dark grey text for contrast */
+    width: 20vw; /* 20% of the viewport width */
+}
+
+.customer-details-table td {
+    background-color: #ffffff; /* White background for data cells */
+    width: 80vw; /* 80% of the viewport width */
+}
+
+.customer-details-table tr:hover {
+    background-color: #f0f8ff; /* Very light blue for hover effect */
+}
+
+
+#customerInfo {
+    position: relative; /* Adjusted for relative positioning */
+    padding: 10px;
+    font-size: 16px;
+}

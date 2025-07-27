@@ -1,0 +1,26 @@
+# Node
+daemon
+node_modules/
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Build/output/pdf
+*.tar
+*.zip
+*.pdf
+
+# Backup
+backup.sql
+
+
+# Services to ignore
+serviceCreate.js
+serviceDelete.js
+
+# Editor/IDE
+.vscode/
+.idea/
+.env

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Search</title>
+    
+    <link rel="stylesheet" href="/index/style.css">
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/shared/styles/base.css">
+    <link rel="stylesheet" href="/shared/styles/buttons.css">
+    <link rel="stylesheet" href="/shared/styles/modals.css">
+    <link rel="stylesheet" href="/shared/styles/tables.css">
+    <link rel="stylesheet" href="/shared/styles/typography.css">
+    <link rel="stylesheet" href="/shared/styles/search-pages.css">
+</head>
+<body>
+    <div id = "masterContainer">  
+
+        <div id="searchContainer">
+            <h1>Search for all customer sales on Vend/Lightspeed (2015 - 2024)</h1>
+            <input type="text" id="searchInput" placeholder="Enter customer first/last/company name...">
+            <p style="font-size: 30px; font-weight: bold;">—————— OR ——————</p>
+            <p style="font-weight: bold;">Search for transactions using invoice/receipt number, date range, and min/max order value below</p>
+            <br>
+            Invoice/receipt number:
+            <input type="text" id="invoiceNum" placeholder="Enter invoice/receipt no...">
+
+            <br><br>
+            ----------------
+            <br><br>
+            (Click the calendar icons to open a calendar, or type the date manually)
+            <br><br>
+            Start date:
+            <input type="date" id="datePickerStart" placeholder="Start Date">
+            
+            <br>
+            End date: 
+            <input type="date" id="datePickerEnd" placeholder="End Date">
+            <br><br>
+            ----------------
+            <br><br>
+            <input type="text" id="numericInput1" placeholder="Min order total...">
+            <input type="text" id="numericInput2" placeholder="Max order total...">
+            <br></br>
+            <button id="goButton">Begin search...</button>
+            <button id="clearButton">Clear values</button>
+            <br><br><br>
+        </div>
+    </div>
+    <script src="/index/script.js"></script>
+</body>
+</html>

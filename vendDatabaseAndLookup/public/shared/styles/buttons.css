@@ -1,0 +1,29 @@
+button, .button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+/* Green (Main search page) */
+button {
+    background-color: #4CAF50;
+    color: white;
+}
+button:hover {
+    background-color: #45a049;
+}
+
+/* Blue (Customer pages) */
+.button {
+    background-color: #007BFF;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
