@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/socket.io/socket.io.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leather stock reduction</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="container">
+    <h1>Leather stock reduction</h1>
+    <h3>Use this page to LINK two leather products.</h3>
+    <h3>*** PLEASE USE THE 'HELP' BUTTON TO UNDERSTAND HOW THIS PROCESS WORKS! ***</h3>
+    <button onclick="help1()">Help!</button>
+    <button onclick="help2()">What does the 'Force' button do?</button>
+
+    <div id="confirmPopup" style="display: none;">
+      <h3>Stock in Square will be reduced by the following:</h3>
+      <p>This is <strong>NOT</strong> easily reversible without manually changing each item's stock level, so ensure everything is correct before confirming. <strong>Also double check that you generated an invoice, if required</strong></p>
+      <table id="confirmTable">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Amount to reduce</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button onclick="processTableData()">Confirm and reduce stock</button>
+      <button onclick="closePopup('reviewStock')">CANCEL</button>
+    </div>
+
+    <div id="checkStock" style="display: none;">
+      <h3>The invoice CSV should automatically download. You can now import this to Xero!</h3>
+      <p>Stock has <strong>NOT</strong> yet been updated. Would you like to review stock now?</p>
+      <button onclick="prepareProcessTableData()">Review stock...</button>
+      <button onclick="closePopup('stockCheck')">Do it later</button>
+    </div>
+
+    <div id="done" style="display: none;">
+      <h1 id="messageHeading"></h1>
+      <p id="messageBody"></p>
+      <button id="closeButton"></button>
+    </div>
+
+    <div id="initialLoad" style="display: none;">
+      <h3>Would you like to update prices?</h3>
+      <p id="updateTime">The last time a full price update was completed was: </p>
+      <button onclick="updateAllPricesOnLoad()">Yes, update prices</button>
+      <button onclick="closePopup('initialLoad')">No, skip it</button>
+    </div>
+
+    <div id="running" style="display: none;">
+      <h3>PERFORMING ACTIONS...</h3>
+    </div>
+
+    <div id="doneRunning" style="display: none;">
+      <h3>DONE!</h3>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="grid">
+        <thead>
+          <tr>
+            <th>In-store SKU</th>
+            <th>In-store Item</th>
+            <th>In-store Price (for reference)</th>
+            <th>Online SKU</th>
+            <th>Online Item</th>
+            <th>Online Price (for reference)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td contenteditable="true">Search In-Store SKU/Barcode...</td>
+            <td contenteditable="true">Search In-Store Item...</td>
+            <td contenteditable="false">0</td>
+            <td contenteditable="true">Search Online SKU/Barcode...</td>
+            <td contenteditable="true">Search Online Item...</td>
+            <td contenteditable="false">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="controls">
+      <button onclick="insertRow()">Insert row</button>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+  <script type="module" src="scripts/main.js"></script>
+</body>
+</html>
