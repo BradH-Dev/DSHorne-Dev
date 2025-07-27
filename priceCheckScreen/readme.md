@@ -68,3 +68,7 @@ Change this line to point to your own backend service.
 ### 3. Branding
 
 -   Replace `asw.png` with your own logo or store branding as desired.
+
+<img width="805" height="1330" alt="image" src="https://github.com/user-attachments/assets/e671cddd-17d3-4fb8-9913-c2b2f0093317" />
+<img width="791" height="1318" alt="image" src="https://github.com/user-attachments/assets/642a9dd6-b34d-4e7a-8e43-831793b897e4" />
+
