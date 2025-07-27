@@ -78,3 +78,5 @@ The tool will:
 - **Persistence Layer:** Flat `.csv` files (no database)
 
 ---
+<img width="1018" height="724" alt="image" src="https://github.com/user-attachments/assets/b6fe000c-09fd-4c40-9e2a-f12ffa878afc" />
+<img width="654" height="132" alt="image" src="https://github.com/user-attachments/assets/d36ab2d8-22af-4292-b4c4-8adf788d9b0e" />

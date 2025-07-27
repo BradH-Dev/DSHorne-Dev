@@ -50,3 +50,12 @@ It’s built for high-throughput, low-friction use in physical retail environmen
 - Logos can be swapped in `/assets/` for instant branding.
 
 ---
+
+<img width="1273" height="765" alt="image" src="https://github.com/user-attachments/assets/77fbee24-838a-4c36-918a-953f0b28d4ba" />
+<img width="1690" height="1074" alt="image" src="https://github.com/user-attachments/assets/bce1546c-a0fc-421d-ac5a-b608f03e5c71" />
+<img width="1733" height="1155" alt="image" src="https://github.com/user-attachments/assets/c7b6719b-a487-4dde-bf35-373699e43ff1" />
+<img width="757" height="1068" alt="image" src="https://github.com/user-attachments/assets/f3530328-a3f0-4f0a-874a-2bb015cdb1d3" />
+
+
+
+
