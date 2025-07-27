@@ -1,0 +1,25 @@
+# Node
+daemon
+node_modules/
+*.log
+
+
+# Build/output/pdf
+*.tar
+*.zip
+*.pdf
+uploads
+ngrok.exe
+launchNgrok.yml
+tableData
+nssm.exe
+
+
+# Services to ignore
+serviceCreate.js
+serviceDelete.js
+
+# Editor/IDE
+.vscode/
+.idea/
+.env

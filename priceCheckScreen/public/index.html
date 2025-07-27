@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Barcode Scanner Client</title>
+    <meta http-equiv="Permissions-Policy" content="interest-cohort=()">
+<style>
+
+html::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: repeating-linear-gradient(-45deg, rgb(255, 100, 100) 0%, rgb(255, 255, 88) 7.14%, rgb(114, 255, 114) 14.28%, rgb(60, 255, 255) 21.42%, cyan 28.56%, #7777ff 35.7%, rgb(255, 142, 255) 42.84%, rgb(255, 100, 100) 50%);
+  background-size: 9000vw 9000vw;
+  animation: slide 120s infinite linear both;
+  transition: filter 1000ms ease-out;
+}
+
+/* The "pop" class for the background */
+html.pop::before {
+  filter: brightness(1.6);
+}
+        body {
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+            perspective: 1000px;
+            filter: brightness(1);
+            transition: filter 1000ms ease-out;
+}
+
+body, #productDetails {
+    font-family: Baskerville, sans-serif;
+}
+
+    /* The "pop" class increases brightness */
+    body.pop {
+      filter: brightness(1.5);
+    }
+
+    /* New centered image styling */
+    #centerImage {
+      position: fixed;
+      top: 130px;
+      left: 155px;
+      transform: translate(-50%, -50%);
+      width: 32vw;
+      height: 32vh;
+      object-fit: contain;
+      filter: drop-shadow(1.5px 1.5px 1px #000000);
+      z-index: 1; /* Ensures the image sits above the background gradient */
+    }
+
+@keyframes slide {
+  0% {
+    background-position-x: 0%;
+  }
+  100% {
+    background-position-x: 9000vw;
+  }
+}
+
+
+        #status, #productDetails, #waitOverlay {
+            z-index: 0;
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            
+            transition: all 0.5s ease;
+        }
+        #status {
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.5);
+            font-size: 48px;
+            position: absolute;
+            margin-left: 50px;
+            width: 80%;
+            text-align: center;
+            background: none;
+        }
+
+        /* Create a pseudo-element for the dots */
+        #status::after {
+            content: var(--dots, '');
+            display: inline-block;
+            min-width: 1.5em;
+            text-align: left;
+        }
+        #productDetails {
+            font-size: 35px; /* Larger font size */
+            color: #000000; /* A pleasant green color */
+            top: 32vh;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.5); /* Text shadow for better readability */
+        }
+        img {
+
+            max-width: 50vw;
+            max-height: 50vh;
+            margin-top: 20px;
+            filter: drop-shadow(15px 15px 20px #000000);
+            border-radius: 5%;
+
+        }
+
+        #productDetails.show, #waitOverlay.show {
+            opacity: 1;
+        }
+
+        #waitOverlay {
+            position: fixed; /* Use fixed to cover the entire viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85); /* Dark overlay for better visibility of the message */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+            opacity: 0;
+            z-index: 1000; /* Make sure it covers everything */
+            backdrop-filter: blur(5px); /* Blur the content behind the overlay */
+            transition: opacity 0.5s ease;
+        }
+        
+    </style>
+    <script>
+        let backgroundTime = 60;
+        let adjustment = null;
+
+        let scanBarcodeText = "Ready to scan";
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            let activeRequest = false; // Flag to track if there's an ongoing request
+            let waitingForConnection = false;
+            const statusEl = document.getElementById('status');
+            // Get the computed font size (e.g., "72px") and parse it to a number.
+            const fontSize = parseFloat(window.getComputedStyle(statusEl).fontSize);
+            // Adjust top to be 40vh minus half the font size.
+            adjustment = `calc(45vh - ${fontSize}px)`;
+            statusEl.style.top = adjustment;
+            let ws = null;
+            let barcode = '';
+            let intervalId = null; // Track the interval ID for dot animation
+            let detailsTimeout = null; // Timer for clearing product details
+            let unknownTimeout = null;
+            let statusTimeout = null;
+
+            function initializeWebSocket() {
+                clearInterval(intervalId); // Clear any existing interval
+                if (ws) {
+                    ws.close();  // Ensures that any existing WebSocket connection is closed
+                }
+
+                ws = new WebSocket('ws://100.79.229.118:4100');
+                ws.onopen = function() {
+                    console.log('Connected to the server');
+                    document.getElementById('status').textContent = `${scanBarcodeText}`;
+                    waitingForConnection = false;
+                };
+
+                ws.onmessage = function(event) {
+                    console.log('Message from server: ', event.data);
+                    const data = JSON.parse(event.data);
+                    if (data.message) {
+                        updateStatus(data.message);
+                    }
+                    if (data.price) {
+                        displayProductDetails(data);
+                    }
+
+                };
+
+                ws.onclose = function() {
+                    console.log('Connection closed, reinitializing...');
+                    setTimeout(initializeWebSocket, 1000); // Wait 1 second before reinitializing
+                };
+
+                ws.onerror = function(error) {
+                    console.log('WebSocket error:', error);
+                    document.getElementById('status').textContent = 'Error occurred. Reconnecting...';
+                    ws.close();
+                };
+            }
+
+            function updateStatus(message) {
+            clearInterval(intervalId); // Clear existing interval before setting a new one
+            clearTimeout(unknownTimeout);
+
+
+            if (message.includes('fetching')){
+                popBackgroundBrightness();
+                animateDots('Almost there');
+            } else if (message.includes('searching1')) {
+                animateDots('Searching for product');
+                const statusDetails = document.getElementById('status');
+                statusDetails.style.opacity = '1'; // Begin fade out
+                clearTimeout(statusTimeout);
+                
+            } else if (message.includes('searching2')) {
+                animateDots('Almost there');
+            }
+            else if (message.includes('scanBarcode')){
+                animateDots(`${scanBarcodeText}`);
+
+            } else {
+                document.getElementById('status').innerHTML = message;
+                document.getElementById('status').style.setProperty('--dots', ``);
+               // animateDots(message);
+                document.getElementById('status').style.top = adjustment;
+                clearTimeout(unknownTimeout);
+                unknownTimeout = setTimeout(() => {
+                    animateDots(`${scanBarcodeText}`);
+                    document.getElementById('status').style.top = adjustment;
+                    activeRequest = false;
+                }, 16000);
+                activeRequest = false;
+            }
+            
+        }
+
+  
+    // This function temporarily "pops" the background by increasing its brightness.
+    // It adds the 'pop' class to the body, which is then removed after 500ms.
+    function popBackgroundBrightness() {
+      const htmlEl = document.documentElement;
+      htmlEl.classList.add('pop');
+      setTimeout(() => {
+        htmlEl.classList.remove('pop');
+      }, 1000);
+
+
+      const body = document.body;
+      body.classList.add('pop');
+      setTimeout(() => {
+        body.classList.remove('pop');
+      }, 500);
+
+
+    }
+            async function displayProductDetails(data) {
+                const statusDetails = document.getElementById('status');
+                const productDetailsElement = document.getElementById('productDetails');
+                
+
+                statusDetails.style.opacity = '0'; // Begin fade out
+                
+                clearInterval(intervalId); // Stop the animation
+                clearTimeout(unknownTimeout);
+                clearTimeout(statusTimeout);
+                clearTimeout(detailsTimeout); // Clear any existing timeout to avoid premature clearing
+
+                let detailsHtml = `${data.itemName}<br><span style="font-size: 50px";>${data.price} ${data.currency}</span>`;
+                if (data.imageUrl) {
+
+                    detailsHtml += `<br><img src="${data.imageUrl}">`; // Display image
+                }
+                statusDetails.style.top = '5vh';
+                productDetailsElement.style.opacity = '1';
+
+
+                statusTimeout = setTimeout(() => {
+                    statusDetails.style.opacity = '1'; // Begin fade in
+                    }, 3000);
+                //document.getElementById('status').textContent = "Scan a barcode when ready";
+                productDetailsElement.innerHTML = detailsHtml;
+                productDetailsElement.classList.add('show');
+                
+                detailsTimeout = setTimeout(() => {
+                    productDetailsElement.style.opacity = '0'; // Begin fade out
+                    setTimeout(() => {
+                        document.getElementById('status').style.top = adjustment;
+                    }, 1500); // Wait for fade-out to finish before clearing
+                    setTimeout(() => {
+                        productDetailsElement.textContent = '';
+                        productDetailsElement.classList.remove('show');
+                        productDetailsElement.innerHTML = '';
+                        
+                    }, 2000); // Wait for fade-out to finish before clearing
+                }, 10000); // Display details for 10 seconds before starting fade-out
+
+                
+                
+                setTimeout(() => {
+                    activeRequest = false;
+                    }, 600);
+                ws.close(); // Close the connection after displaying product details
+            }
+            function animateDots(baseMessage) {
+                clearInterval(intervalId); // Clear any previous interval
+                let count = 0;
+                // Update the base message text (without dots)
+                document.getElementById('status').textContent = baseMessage;
+                // Ensure that the pseudo-element remains and is controlled via a CSS variable
+                document.getElementById('status').style.setProperty('--dots', '');
+                
+                intervalId = setInterval(() => {
+                    let dots = '.'.repeat(count % 4);
+                    document.getElementById('status').style.setProperty('--dots', `"${dots}"`);
+                    // You can then use the CSS variable in your ::after content property if desired
+                    count++;
+                }, 500);
+            }
+            function sendBarcode() {
+                // Strip leading zeros before sending the barcode
+                barcode = barcode.replace(/^0+/, '');
+                if (ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ barcode: barcode }));
+                    barcode = '';
+                } else {
+                    console.log("Waiting for connection...");
+                    setTimeout(sendBarcode, 50); // Retry after a short delay
+                }
+            }
+
+
+            function showWaitOverlay() {
+                const overlay = document.getElementById('waitOverlay');
+                overlay.classList.add('show');
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                }, 1000); // Fade away after 1 second
+            }
+
+            document.addEventListener('keypress', function(e) {
+                if (e.key === "Enter") {
+                    processBarcode(); // Process the barcode when Enter is pressed
+                } else if (!activeRequest && !waitingForConnection) {
+                    barcode += e.key; // Accumulate barcode characters only if not submitting or waiting
+                }
+            });
+
+            document.addEventListener('paste', function(e) {
+                // Get text from clipboard
+                var pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                // Append the pasted text to barcode
+                barcode += pastedText;
+                // Stop the default pasting action
+                e.preventDefault();
+            });
+
+            function processBarcode() {
+                if (barcode.length > 0 && !activeRequest && !waitingForConnection) {
+                    console.log(barcode); // Log the current barcode
+                    activeRequest = true; // Set flag to prevent further requests
+                    clearTimeout(detailsTimeout);
+                    const productDetailsElement = document.getElementById('productDetails');
+                    productDetailsElement.style.opacity = '0';
+                    document.getElementById('productDetails').textContent = '';
+                    document.getElementById('productDetails').classList.remove('show');
+                    document.getElementById('status').style.top = adjustment;
+                    sendBarcode(); // Handle sending barcode
+                } else {
+                    showWaitOverlay();
+                }
+            }
+
+            initializeWebSocket(); // Start the WebSocket connection when the DOM is ready
+        });
+    </script>
+</head>
+<body>
+    <img id="centerImage" src="asw.png" alt="Centered Image">
+    <div class="wrapper"></div>
+    <p id="status">Initializing...</p>
+    <div id="productDetails"></div>
+    <div id="waitOverlay">Please wait for previous search</div>
+</body>
+</html>
+
+
+
