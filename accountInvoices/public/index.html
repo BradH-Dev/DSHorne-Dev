@@ -1,0 +1,618 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Invoicing</title>
+<style>
+
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;  /* Start at the top */
+  font-family: Arial, sans-serif;
+}
+
+#container {
+  width: 80vw;
+  min-height: 100vh;    /* 🔥 At least viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  padding-bottom: 30px;  /* 🔥 Permanent bottom gap */
+  box-sizing: border-box;
+}
+
+
+  #grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px; /* Space between the grid and the controls */
+    table-layout: fixed;
+    position: relative; /* To position the checkbox */
+  }
+  #grid th, #grid td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: break-word;
+  }
+  #grid th:nth-child(1), #grid td:nth-child(1) { width: 20%; }
+  #grid th:nth-child(2), #grid td:nth-child(2) { width: 45%; }
+  #grid th:nth-child(3), #grid td:nth-child(3) { width: 20%; }
+  #grid th:nth-child(4), #grid td:nth-child(4) { width: 10%; }
+  #grid th:nth-child(5), #grid td:nth-child(5) { width: 10%; }
+  #grid th:nth-child(6), #grid td:nth-child(6) { width: 10%; }
+  #grid th:nth-child(7), #grid td:nth-child(7) { width: 30%; }
+  th {
+    background-color: #f2f2f2;
+    position: relative;
+  }
+  td[contenteditable="true"]:focus {
+    background-color: #e8f0fe;
+  }
+  div.controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  button {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .dropdown-content {
+    display: none; /* Hidden by default */
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    border: 1px solid #ddd; /* Optional, for better visibility */
+  }
+
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    white-space: nowrap; /* Ensures the text does not wrap */
+    cursor: pointer; /* 👈 Add this line */
+  }
+
+  .dropdown-content a:hover {background-color: #f1f1f1}
+  
+  /* Position the checkbox at the top right of the grid */
+  .top-right-checkbox {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+  }
+
+  #confirmTable th, #confirmTable td, #confirmTableRecount th, #confirmTableRecount td {
+        padding: 8px;  /* Adds padding for readability */
+        border: 1px solid #ddd;  /* Adds border to distinguish cells */
+        text-align: left;  /* Aligns text to the left */
+        vertical-align: top;  /* Aligns content to the top */
+        word-wrap: break-word;  /* Ensures text wraps within the cell */
+    }
+
+    #confirmTable th:nth-child(1), #confirmTable td:nth-child(1),#confirmTableRecount th:nth-child(1), #confirmTableRecount td:nth-child(1) {
+        width: 75%;  /* Sets width for the item description column */
+    }
+
+    #confirmTable th:nth-child(2), #confirmTable td:nth-child(2),#confirmTableRecount th:nth-child(2), #confirmTableRecount td:nth-child(2) {
+        width: 25%;  /* Sets width for the quantity column */
+    }
+
+    #ordersPopup {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      border: 2px solid black;
+      padding: 20px;
+      z-index: 100;
+      overflow-y: auto;
+      max-height: 90vh;
+      width: 75%;
+    }
+
+
+    #ordersPopup table tr:hover {
+    background-color: #f1f1f1;  /* Light gray background on hover */
+    cursor: pointer;  /* Change cursor to indicate clickable rows */
+    
+}
+#confirmPopup, #confirmPopupRecount {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 2px solid black;
+    padding: 20px;
+    z-index: 100;
+    max-width: 70vw; /* Maximum width */
+    max-height: 90vh; /* Maximum height */
+    overflow-y: auto; /* Enables vertical scrollbar when necessary */
+}
+
+.total-container {
+    width: 100%;
+    text-align: right;
+    margin-top: 2px;
+    font-size: 18px; /* Optional: Make total a bit larger */
+    font-weight: bold; /* Optional: Make it bold */
+}
+
+.controls {
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Buttons spaced out evenly */
+    margin-top: 10px; /* Space between total and buttons */
+    margin-bottom: 50px;
+}
+
+
+</style>
+
+
+
+<style>
+    /* ONLY styling inside #quoteSection to avoid conflict */
+    #quoteSection {
+      width: 65%;
+      margin-top: 20px;
+    }
+    #quoteSection .quote-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #fafafa;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    #quoteSection .left {
+      flex: 1;
+      padding-right: 20px;
+    }
+    #quoteSection .right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    #quoteSection #quote {
+      margin: 5px;
+      font-size: 20px;
+    }
+    #quoteSection #name {
+      margin: 0px;
+      font-size: 18px;
+      color: rgb(75, 75, 75);
+    }
+    #quoteSection #clipLink {
+      margin: 10px 0;
+    }
+    #quoteSection #newQuoteButton {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+  /* Only inside button-wrapper */
+  .button-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .hover-tooltip {
+    position: absolute;
+    background-color: black;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    pointer-events: none; /* Important: don't block mouse */
+    opacity: 0;
+    transition: opacity 0.1s;
+    white-space: nowrap;
+    transform: translate(-50%, -150%); /* Center above mouse */
+    z-index: 10;
+  }
+
+  .button-wrapper:hover .hover-tooltip {
+    opacity: 1;
+  }
+
+</style>
+
+
+</head>
+<body>
+<div id="container">
+  <div id="ordersPopup">
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dynamically filled rows with onclick event -->
+      </tbody>
+    </table>
+  </div>
+    <!-- Seinfeld Quote Section -->
+    <div id="quoteSection">
+      <h3 style="text-align: center;">Seinfeld Quote of the Day</h3>
+      <div class="quote-container">
+        <div class="left">
+          <div id="quote"></div>
+          <div id="name"></div>
+        </div>
+        <div class="right">
+          <div id="clipLink"></div>
+          <div class="button-wrapper">
+            <button id="newQuoteButton"></button>
+            <div id="hoverTooltip" class="hover-tooltip"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <script>
+    let currentLimit = 5; // Default, until server tells us
+    const quoteDiv = document.getElementById('quote');
+    const nameDiv = document.getElementById('name');
+    const clipLinkDiv = document.getElementById('clipLink');
+
+    const newQuoteButton = document.getElementById('newQuoteButton');
+    const hoverTooltip = document.getElementById('hoverTooltip');
+
+    newQuoteButton.addEventListener('mousemove', (e) => {
+      const rect = newQuoteButton.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      hoverTooltip.style.left = `${x}px`;
+      hoverTooltip.style.top = `${y}px`;
+      
+    });
+
+    newQuoteButton.addEventListener('mouseleave', () => {
+      hoverTooltip.style.opacity = 0;
+    });
+
+    newQuoteButton.addEventListener('mouseenter', () => {
+      hoverTooltip.style.opacity = 1;
+    });
+
+
+    const socket = new WebSocket('ws://' + window.location.hostname + ':1234');
+
+    socket.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  if (data.quote) {
+    quoteDiv.textContent = `"${data.quote}"`;
+    nameDiv.innerHTML = `
+      <span style="font-size: 22px;">- ${data.speaker}</span>, 
+      "${data.name}" (${data.season})
+    `;
+
+    const formattedQuote = encodeURIComponent(`${data.quote}? :seinfeld ${data.name}`);
+    clipLinkDiv.innerHTML = `<a href="https://getyarn.io/yarn-find?text=${formattedQuote}" target="_blank">View clip</a>`;
+  }
+
+  if (data.limit !== undefined) {
+    currentLimit = data.limit;
+    updateButton();
+  }
+};
+
+const georgeisms = [
+  "That's it! No more quote refreshes! You’re gonna have to wait until tomorrow, buddy.",
+  "You've refreshed so much. I never picked you as a refresher. But you are. You're a dirty refresher!",
+  "You're refreshing like a maniac! This is madness, Jerry, madness!",
+  "One more click, and *boom*! No quotes left! What are you doing to yourself?!",
+  "You think the quotes just grow on trees? They don't, Jerry, they don't!",
+  "You burned through them all! Like a matchstick!",
+  "No more quotes! Finished! Kaput! Say goodnight, Jerry!",
+  "You had a good thing going... and you blew it!",
+  "Refresh, refresh, refresh — you couldn't stop yourself, could you?!",
+  "You are the Picasso of wasting quote refreshes!",
+  "Refresh all you want — it’s not gonna bring the good quotes back, Jerry!",
+  "It's over! You're outta quotes! It's like losing at blackjack — you can't just keep playing!",
+  "You refreshed yourself right into oblivion. Congratulations!",
+  "You had self-control! You had dignity! And now look at you — you're nothing, Jerry!",
+  "You can't just *will* more quotes into existence! Believe me, I've tried!",
+  "This is why we can't have nice things, Jerry! Because people like you can't stop refreshing!",
+  "You're living in a fantasy world if you think there's another quote coming!",
+  "You spent your refreshes faster than I spend my lunch money!",
+  "Gone! Vanished! Like my dignity after a bad date!",
+  "You used your last refresh on *that* quote?! Oh, you blew it big time!",
+  "Another refresh? Why don't you just ask the universe for a miracle while you're at it!",
+  "Look at you! Outta quotes and nowhere to go! It's a tragedy, Jerry!",
+  "You've got a better chance of seeing Bigfoot than getting another refresh today!",
+  "Refreshing now is like trying to unburn a piece of toast — it's done!",
+  "You chased the dragon, Jerry! And now the dragon is gone!",
+  "This is what happens, Jerry! You push and push — and then poof! Nothing!"
+];
+
+const georgeismsNormal = [
+  "Plenty of refreshes! We're swimming in refreshes, Jerry!",
+  "You’re flush, you're loaded! Like a Rockefeller of refreshes!",
+  "Relax! You've got more refreshes than sense!",
+  "Three refreshes? You’re basically a king! A king, Jerry!",
+  "Live it up! Splash those refreshes around like it's Mardi Gras!",
+  "What’s the worst that could happen? You’re rich in clicks!",
+  "Ahhh, you could burn a few... who's counting?",
+  "You're refresh wealthy, Jerry! Make it rain!",
+  "Go ahead! Be reckless! The world is your oyster!",
+  "Refresh like nobody’s watching! Dance like Elaine!",
+  "I've seen George with more self-control at a sandwich shop — and that's sayin' somethin'!",
+  "You're sittin' on a mountain of refreshes, Jerry! A mountain!",
+  "Who needs strategy? Just click! Click like you're trying to flag down a cab!",
+  "You got so many refreshes, you could open a bank! Bank of Refresh!",
+  "Feel that? That's the luxury of options, Jerry! Breathe it in!",
+  "Kramer says if you’re thinking, you're losing. So don’t think — click!",
+  "You’re basically a millionaire — but in refreshes instead of cash!",
+  "Spend a few, who cares? George wasted an entire summer trying to be an architect!",
+  "You’re flying first class, Jerry. First class!",
+  "This is the high life! Refreshes raining down like confetti at a parade!"
+];
+
+const georgeismsWarning = [
+  "Two refreshes left, Jerry! TWO! This is critical!",
+  "You’re down to two! It’s DEFCON 2 here!",
+  "Refresh now? You're playing with fire, my friend!",
+  "Careful! One slip and you’re outta the game!",
+  "You’re on the razor’s edge, Jerry. One bad move!",
+  "Two clicks between you and oblivion!",
+  "Choose wisely! Like picking a lobster at a restaurant!",
+  "This is the part where it all goes south, Jerry!",
+  "You can almost smell the end, can't you?",
+  "One wrong click... and it's George-level disaster!",
+  "TWO refreshes! It's like being trapped in an elevator with Newman — no way out!",
+  "You’re teetering, Jerry! One gust of wind and you’re done!",
+  "Two left! It's like Kramer with two pretzels — one's already gone!",
+  "You're dancing on a landmine, buddy! One wrong step!",
+  "Ever seen George save dessert for later? NO! Neither will you with these refreshes!",
+  "Two clicks left — that’s barely enough to call it living!",
+  "This isn't playing it cool — this is slipping on a banana peel!",
+  "Refresh now? That's the kind of thinking that got George banned from the pool!",
+  "You’re on the edge, Jerry! Even Kramer wouldn’t bet on you now!",
+  "You can hear the buzzer already, can’t you, Jerry!? It's coming!"
+];
+
+const georgeismsPanic = [
+  "ONE REFRESH LEFT! YOU MANIAC! YOU ABSOLUTE MANIAC!",
+  "You’re hanging by a THREAD, Jerry! A THREAD!",
+  "One more click and it’s curtains! CURTAINS!",
+  "This is it! Endgame! Last dance!",
+  "Refresh now and you’re DONE! FINISHED! KAPUT!",
+  "You're living on borrowed time, my friend!",
+  "You think you can handle the last refresh? YOU CAN’T HANDLE IT!",
+  "It’s like Russian roulette, except every chamber is loaded AND you're aware of it!",
+  "You're one bad decision away from total quote annihilation!",
+  "ONE refresh! It's like George at a free sample tray — sheer madness!",
+  "You're dangling, Jerry! DANGLING! One click from the abyss!",
+  "You refresh now, you’re done! Like George at a job interview — disaster!",
+  "This is the part where you start talking to yourself in public.",
+  "It's over! Finito! You’re one click away from becoming a cautionary tale!",
+  "Kramer wouldn't even TOUCH a refresh at this point!",
+  "You're one refresh from the end of civilization as we know it!",
+  "One click, Jerry, and you're sitting alone at Monk’s with no soup!",
+  "This isn’t just panic — it’s PANIC PANDEMONIUM!"
+];
+
+
+let unusedGeorgeisms = [...Array(georgeisms.length).keys()]; // Initially [0,1,2,...]
+let unusedNormal = [...Array(georgeismsNormal.length).keys()];
+let unusedWarning = [...Array(georgeismsWarning.length).keys()];
+let unusedPanic = [...Array(georgeismsPanic.length).keys()];
+
+function getRandomGeorgeism(pool, sourceArray) {
+  if (pool.length === 0) {
+    // If pool is empty, refill it
+    pool.push(...Array(sourceArray.length).keys());
+  }
+
+  const randomIndexInPool = Math.floor(Math.random() * pool.length);
+  const quoteIndex = pool[randomIndexInPool];
+
+  pool.splice(randomIndexInPool, 1); // Remove used index
+  return sourceArray[quoteIndex];
+}
+
+function updateButton() {
+
+  let refreshes = 'refreshes';
+  if (currentLimit === 1) refreshes = 'refresh';
+
+  newQuoteButton.disabled = false;
+  newQuoteButton.style.backgroundColor = '';
+  newQuoteButton.textContent = `Get different quote (${currentLimit})`;
+
+  if (currentLimit === 0) {
+    newQuoteButton.textContent = 'Quote refreshes exhausted, check back tomorrow!';
+    newQuoteButton.disabled = true;
+    newQuoteButton.style.backgroundColor = '#ccc';
+  }
+
+  // Remove any existing mouseenter listener
+  newQuoteButton.onmouseenter = null;
+
+  // Function to dynamically choose right list + pool
+  function updateTooltip() {
+    let chosenList, unusedPool;
+
+    if (currentLimit >= 3) {
+      chosenList = georgeismsNormal;
+      unusedPool = unusedNormal;
+    } else if (currentLimit === 2) {
+      chosenList = georgeismsWarning;
+      unusedPool = unusedWarning;
+    } else if (currentLimit === 1) {
+      chosenList = georgeismsPanic;
+      unusedPool = unusedPanic;
+    } else if (currentLimit === 0) {
+      chosenList = georgeisms;
+      unusedPool = unusedGeorgeisms;
+    }
+
+    const randomGeorgeism = getRandomGeorgeism(unusedPool, chosenList);
+
+    if (currentLimit > 0) {
+      hoverTooltip.innerHTML = `You've got ${currentLimit} ${refreshes} left today. ${randomGeorgeism}`;
+    } else {
+      hoverTooltip.innerHTML = randomGeorgeism;
+    }
+
+  }
+
+  // Attach listener
+  newQuoteButton.addEventListener('mouseenter', updateTooltip);
+
+  // Immediately refresh tooltip
+  updateTooltip();
+}
+
+
+
+newQuoteButton.addEventListener('click', () => {
+  if (currentLimit > 0) {
+    fetch('/quotes/new-quote', { method: 'POST' })
+      .then(response => response.json())
+      .then(data => {
+        if (data.limit !== undefined) {
+          currentLimit = data.limit;
+          updateButton();
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+});
+  </script>
+  <h1>Invoicing for account customers & stock reduction</h1>
+  <h4>Includes functionality to search existing orders on Square in order to generate invoices</h4>
+  <button onclick="help()">Help!</button>
+  <br><br>
+
+  <div id="confirmPopupRecount" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; border: 2px solid black; padding: 20px; z-index: 100;">
+    <h3>Stock in Square will be re-counted <strong>TO</strong> the following (NOT as a sale - there will be no Cost of Goods Sold ramifications):</h3>
+    <table id="confirmTableRecount" style="width: 100%; margin-bottom: 20px;">
+        <thead>
+          <tr>
+              <th style="width: 75%; word-wrap: break-word;">Item</th>
+              <th style="width: 25%; word-wrap: break-word;">Re-counted amount</th>
+          </tr>
+        </thead>
+        <tbody>
+            <!-- Items will be added here -->
+        </tbody>
+    </table>
+    <button onclick="processTableData(true)">Confirm and re-count stock</button>
+    <button onclick="closePopup('reviewStock')">CANCEL</button>
+</div>
+
+
+  <div id="confirmPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; border: 2px solid black; padding: 20px; z-index: 100;">
+      <h3>Stock in Square will be reduced by the following:</h3>
+      <p>This is <strong>NOT</strong> easily reversible. Reducing stock using this page causes it to be "Sold". This has Cost of Goods ramifications and can be annoying to fix, so ensure everything is correct before confirming. <strong><br>Also double check that you generated an invoice, if required</strong><br><br><strong>Remember:</strong> If the order was placed by a school within Square/if the order is already completed in Square, this step is not needed as Square has already reduced stock and done Cost of Goods</p>
+      <table id="confirmTable" style="width: 100%; margin-bottom: 20px;">
+          <thead>
+            <tr>
+                <th style="width: 75%; word-wrap: break-word;">Item</th>
+                <th style="width: 25%; word-wrap: break-word;">Amount to reduce</th>
+            </tr>
+          </thead>
+          <tbody>
+              <!-- Items will be added here -->
+          </tbody>
+      </table>
+      <button onclick="processTableData(false)">Confirm and reduce stock</button>
+      <button onclick="closePopup('reviewStock')">CANCEL</button>
+  </div>
+
+  <div id="checkStock" style="display: none; position: fixed; max-width: 40vw; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; border: 2px solid black; padding: 20px; z-index: 100;">
+    <h3>The invoice CSV should automatically download. You can now import this to Xero!</h3>
+    <p>Stock has <strong>NOT</strong> yet been updated. If this is a Xero-exclusive invoice, you must reduce stock to adjust CoGS. Would you like to review stock now? <br><br><strong> If the order was placed by a school within Square/if the order is already completed in Square (i.e. you are using this tool simply to send a customised invoice), this step is not needed as Square has already reduced stock and done Cost of Goods</strong></p>
+    <button onclick="prepareProcessTableData(false)">Review stock...</button>
+    <button onclick="closePopup('stockCheck')">Do it later/skip</button>
+  </div>
+
+  <div id="confirmCSVRun" style="display: none; position: fixed; max-width: 40vw; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; border: 2px solid black; padding: 20px; z-index: 100;">
+    <h3>You're about to start the invoice download process</h3>
+    <p>Are you ready to go?</p>
+    <button id="confirmStartCSV">Yes, proceed</button>
+    <button id="cancelStartCSV">Cancel</button>
+  </div>
+
+
+  <div id="running" style="display: none; position: fixed; max-width: 40vw; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; border: 2px solid black; padding: 20px; z-index: 100;">
+    <h3>Running...</h3>
+    <p id="progress"></p> <!-- Placeholder for progress updates -->
+  </div>
+  <div id="done" style="display: none; position: fixed; max-width: 70vw; left: 50%; top: 50%; transform: translate(-50%, -50%); background-color: white; border: 2px solid black; padding: 20px; z-index: 100; overflow-y: auto; max-height: 90vh;">
+    <h1 id="messageHeading"></h1>
+    <p id="messageBody"></p>
+    <button id="closeButton"></button>
+</div>
+  <table id="grid">
+      <tr>
+          <th>SKU</th>
+          <th>Item</th>
+          <th>Quantity (each / ft² / m²)</th>
+          <th>Price (per)</th>
+          <th>Price (all)</th>
+          <th>Discount (%)</th>
+          <th>Edit price (GST check - excl. by default)</th>
+          <th>
+            <!-- Checkbox placed at the top right -->
+            <input type="checkbox" id="topRightCheckbox" class="top-right-checkbox">
+          </th>
+      </tr>
+      <tr>
+          <td contenteditable="true">Search SKU/Barcode...</td>
+          <td contenteditable="true">Search item name...</td>
+          <td contenteditable="true">1</td>
+          <td contenteditable="false"></td>
+          <td contenteditable="false"></td>
+          <td contenteditable="true">0%</td>
+          <td><button onclick="openPricePopup(this.parentElement.parentElement)">Edit</button>
+            <button class="row-toggle">Use unit cost</button></td>
+      </tr>
+  </table>
+  <!-- Total display section under the table -->
+  <div class="total-container">
+    <span>Total: $<span id="totalPrice"></span></span>
+    <br><br>
+  </div>
+
+  <!-- Controls (buttons) section under the total -->
+  <div class="controls">
+    <button onclick="insertRow()">Insert row</button>
+    <button onclick="startCSVProcess()">Generate invoice CSV...</button>
+    <button onclick="prepareProcessTableData(false)">Reduce stock as SOLD in Square...</button>
+    <button onclick="prepareProcessTableData(true)">RE-COUNT stock in Square...</button>
+    <button onclick="searchOrders()">Search Orders...</button>
+  </div>
+
+</div>
+
+  <!-- Add this spacer for extra margin -->
+  <div style="height: 50px;"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuid.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
+
