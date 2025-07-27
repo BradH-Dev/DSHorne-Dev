@@ -81,4 +81,5 @@ You receive a new shipment of products and orders to ship:
 - **PDF Generation:** Custom logic via [pdf-lib](https://pdf-lib.js.org/)
 
 ---
+<img width="2039" height="1056" alt="image" src="https://github.com/user-attachments/assets/83430134-0a59-482d-8960-087e8c6a86f4" />
 
