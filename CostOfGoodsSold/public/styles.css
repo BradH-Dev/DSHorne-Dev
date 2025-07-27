@@ -1,0 +1,97 @@
+body {
+    font-family: sans-serif;
+    margin: 40px;
+    background: #f9f9f9;
+    color: #333;
+  }
+  
+  h1, h2 {
+    color: #3a3027;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 40%;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    border: 1px solid #ccc;
+    padding: 5px;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #eee;
+  }
+  
+  button {
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    margin-top: 10px;
+    margin-right: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  button:hover {
+    background-color: #004999;
+  }
+  
+  button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  #invoicePopup, #done {
+    display: none;
+    position: fixed;
+    max-width: 40vw;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 2px solid black;
+    padding: 20px;
+    z-index: 100;
+    overflow-y: auto;
+    max-height: 90vh;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  
+  #statusText {
+    margin-top: 20px;
+    font-style: italic;
+  }
+  
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+  
+  .dots:after {
+    content: '...';
+    animation: blink 1s step-start infinite;
+  }
+  
+  #dateRangeSection {
+    display: none;
+    margin-top: 10px;
+  }
+  
+  input[type="file"] {
+    display: none;
+  }
+  
+  #fileName {
+    margin-left: 10px;
+    font-style: italic;
+    color: #555;
+  }
+  

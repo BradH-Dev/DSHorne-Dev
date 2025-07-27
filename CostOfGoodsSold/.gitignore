@@ -1,0 +1,23 @@
+# Node
+daemon
+node_modules/
+*.log
+
+
+# Build/output/pdf
+*.tar
+*.zip
+*.pdf
+uploads
+newfile.csv
+processed_details.csv
+scan_results.csv
+
+# Services to ignore
+serviceCreate.js
+serviceDelete.js
+
+# Editor/IDE
+.vscode/
+.idea/
+.env

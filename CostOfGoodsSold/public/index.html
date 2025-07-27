@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cost of Goods Sold Tool</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+<button onclick="help1()">Help!</button>
+<button id="cogsButton">Take me to Cost of Sales reports in Square...</button>
+<button id="xeroButton">Take me to Xero imports...</button>
+
+<div id="invoicePopup">
+  <h2>Include invoice check?</h2>
+  <p id="invoiceCheckText">Would you like to include an invoice check before generating the full report?</p>
+  <div id="dateRangeSection">
+    <label for="startDatePopup">Start Date:</label>
+    <input type="date" id="startDatePopup"><br>
+    <label for="endDatePopup">End Date:</label>
+    <input type="date" id="endDatePopup"><br>
+    <button id="continueWithInvoices">Continue with Invoice Check</button>
+  </div>
+  <button id="yesInvoices">Yes, include invoice check (RECOMMENDED - ALL sales across the entire business will be included)</button>
+  <button id="noInvoices">No, continue without it (NOT recommended - will not include online leather sales or invoice sales)</button>
+</div>
+
+<h1>Match these categories from Square with Xero account</h1>
+<table id="categoriesTable">
+  <thead>
+    <tr><th>Name</th><th style="display: none;">ID</th><th>Selection</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<div id="done">
+  <h1 id="messageHeading"></h1>
+  <p id="messageBody"></p>
+  <button id="closeButton"></button>
+</div>
+
+<h1>Upload and process CoGS files</h1>
+<div style="margin-top: 20px;">
+  <label for="fileInput">
+    <button type="button" id="customFileButton">📁 Choose Cost of Goods file from Square</button>
+  </label>
+  <input type="file" id="fileInput" name="file" accept=".csv" />
+  <span id="fileName"></span>
+</div>
+
+<button id="allProcessesButton">Generate report...</button>
+<div id="statusText">Status: Waiting for file to be uploaded...</div>
+
+<script type="module" src="scripts/main.js"></script>
+</body>
+</html>
