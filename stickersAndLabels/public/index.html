@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Square Label Printing</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.5/JsBarcode.all.min.js"></script>
+</head>
+<body>
+  <div class="main-container">
+    <div class="left-panel">
+      <h2>Print Shipping Labels</h2>
+      <h3>Auspost Labels:</h3>
+      <input type="text" id="shippingLabel" placeholder="Shipping label URL" />
+      <button id="printShippingBtn">Print Auspost Label</button>
+      <h3>Direct Freight Labels:</h3>
+      <input type="file" id="freightFile" accept=".pdf" />
+      <button id="uploadAndPrintBtn">Upload & Print Direct Freight</button>
+    </div>
+
+    <div class="right-panel">
+      <h2>Create Price Stickers/Labels</h2>
+      <p>Product Search:</p>
+      <div id="skuSearchContainer">
+        <div
+          id="skuSearchCell"
+          contenteditable="true"
+          data-placeholder="To quickly find SKU, search for product here..."
+        ></div>
+        <div class="dropdown-content"></div>
+      </div>
+      <p>SKU:</p>
+      <input type="text" id="sku" placeholder="SKU" />
+      <p>Quantity:</p>
+      <input type="number" id="quantity" placeholder="Quantity" min="1" />
+      <div>
+        <input type="checkbox" id="includePrice" />
+        <label for="includePrice">Include price on sticker?</label>
+      </div>
+      <button id="addEntryBtn">Add Entry</button>
+      <button id="generatePdfBtn">Generate PDF</button>
+    </div>
+  </div>
+
+  <table id="entries" class="full-width-table">
+    <h3 style="text-align: center;">Table of stickers to add</h3>
+    <tr>
+      <th>SKU</th>
+      <th>Quantity</th>
+      <th>Item Name</th>
+      <th>Price</th>
+      <th>Actions</th>
+    </tr>
+  </table>
+
+  <div class="grid-container">
+    <p id="overflowMessage"></p>
+    <div class="grid"></div>
+  </div>
+
+  <div id="customAlertOverlay" class="alert-overlay">
+    <div class="alert-popup" id="customAlertBox">
+      <p id="alertMessage"></p>
+      <button onclick="closeCustomAlert()">OK</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { showCustomAlert, closeCustomAlert } from './scripts/utils.js';
+    import { updateGrid } from './scripts/grid.js';
+    import { setupSkuSearch } from './scripts/search.js';
+    import { printShipping, uploadAndPrint } from './scripts/print.js';
+    import { addEntry } from './scripts/entries.js';
+
+    // Attach handlers
+    document.getElementById('printShippingBtn').addEventListener('click', printShipping);
+    document.getElementById('uploadAndPrintBtn').addEventListener('click', uploadAndPrint);
+    document.getElementById('addEntryBtn').addEventListener('click', addEntry);
+    
+    document.getElementById('generatePdfBtn').addEventListener('click', async () => {
+      const { generatePDF } = await import('./scripts/generatePDF.js');
+      generatePDF();
+    });
+
+    setupSkuSearch();
+    updateGrid();
+
+    // Expose alert closer globally so inline onclick works
+    window.closeCustomAlert = closeCustomAlert;
+  </script>
+</body>
+</html>

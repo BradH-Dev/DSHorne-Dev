@@ -1,0 +1,242 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f8ff;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px;
+    gap: 20px;
+    flex-wrap: nowrap;
+}
+
+.left-panel, .right-panel {
+    flex: 1;
+    min-width: 300px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 2px solid #1e90ff;
+}
+
+.left-panel {
+    background-color: #e6f2ff;
+    margin-right: 20px;
+}
+
+.right-panel {
+    background-color: #f9f9ff;
+    position: relative;
+}
+
+h2, h3 {
+    color: #1e90ff;
+}
+
+input, button {
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #1e90ff;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input:focus, button:hover {
+    border-color: #4682b4;
+    box-shadow: 0 0 5px rgba(70, 130, 180, 0.5);
+}
+
+button {
+    background-color: #1e90ff;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4682b4;
+}
+
+#shippingLabel {
+    width: 80%;
+}
+
+#skuSearchContainer {
+    position: relative;
+    display: inline-block;
+    width: 50%;
+}
+
+#skuSearchCell {
+    border: 1px solid #1e90ff;
+    padding: 10px;
+    border-radius: 8px;
+    min-height: 20px;
+    background-color: #fff;
+    width: 100%;
+}
+
+#skuSearchCell::before {
+    content: attr(data-placeholder);
+    color: #888;
+    pointer-events: none;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+}
+
+#skuSearchCell:focus::before,
+#skuSearchCell:not(:empty)::before {
+    display: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #1e90ff;
+    border-radius: 8px;
+    z-index: 9999;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-content div {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-content div:hover {
+    background-color: #e6f2ff;
+}
+
+.variation-popup {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid #1e90ff;
+    background-color: white;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-radius: 12px;
+    min-width: 20vw;
+    max-width: 30vw;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.variation-popup button {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+
+.variation-popup button:hover {
+    background-color: #4682b4;
+}
+
+.full-width-table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+.full-width-table th, .full-width-table td {
+    border: 1px solid #1e90ff;
+    padding: 10px;
+    text-align: center;
+}
+
+.full-width-table th {
+    background-color: #1e90ff;
+    color: white;
+}
+
+.grid-container {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    width: 180px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#overflowMessage {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #1e90ff;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 30px);
+    grid-template-rows: repeat(13, 20px);
+    gap: 3px;
+}
+
+.grid-box {
+    width: 30px;
+    height: 20px;
+    background-color: #d3e9ff;
+    border-radius: 4px;
+}
+
+.grid-box.filled {
+    background-color: #1e90ff;
+}
+
+.alert-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+}
+
+.alert-popup {
+    background-color: #fff;
+    border: 2px solid #1e90ff;
+    border-radius: 12px;
+    padding: 20px 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 400px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.alert-popup button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #1e90ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.alert-popup button:hover {
+    background-color: #4682b4;
+}
