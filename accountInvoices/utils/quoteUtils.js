@@ -23,12 +23,15 @@ function timestampMaker() {
 
 function broadcastQuote(quoteData) {
     currentQuoteData = quoteData;
-    clients.forEach(ws => {
-        if (ws.readyState === ws.OPEN) {
-            ws.send(JSON.stringify({ ...quoteData, limit: quoteClickLimit }));
-        }
+
+    const liveClients = clients.filter(ws => ws.readyState === ws.OPEN);
+    console.log('📡 Broadcasting to clients:', liveClients.length);
+    liveClients.forEach((ws, index) => {
+        console.log(`Client ${index} state:`, ws.readyState);
+        ws.send(JSON.stringify({ ...quoteData, limit: quoteClickLimit }));
     });
 }
+
 
 function getRandomQuote() {
     if (!quotes.length) return { quote: 'No quotes available', name: '', speaker: '', season: '' };
@@ -49,20 +52,30 @@ function getRandomQuote() {
 }
 
 function loadQuotes() {
-    const filePath = path.join(__dirname, '../cleaned_quotes.csv');
-    fs.createReadStream(filePath)
-        .pipe(csv())
-        .on('data', row => {
-            if (row['Quote'] && row['Name']) {
-                quotes.push({ quote: row['Quote'], name: row['Name'], speaker: row['Speaker'], season: row['Episode'] });
-            }
-        })
-        .on('end', () => {
-            unusedQuotes = [...Array(quotes.length).keys()];
-            const firstQuote = getRandomQuote();
-            broadcastQuote(firstQuote);
-            globalStartup = false;
-        });
+    return new Promise((resolve, reject) => {
+        const filePath = path.join(__dirname, '../cleaned_quotes.csv');
+        fs.createReadStream(filePath)
+            .pipe(csv())
+            .on('data', row => {
+                if (row['Quote'] && row['Name']) {
+                    quotes.push({
+                        quote: row['Quote'],
+                        name: row['Name'],
+                        speaker: row['Speaker'],
+                        season: row['Episode']
+                    });
+                }
+            })
+            .on('end', () => {
+                unusedQuotes = [...Array(quotes.length).keys()];
+                const firstQuote = getRandomQuote();
+                broadcastQuote(firstQuote);
+                globalStartup = false;
+                console.log('Quotes loaded and first quote broadcasted');
+                resolve();
+            })
+            .on('error', reject);
+    });
 }
 
 function scheduleDailyReset() {
@@ -86,9 +99,25 @@ function setClients(wsClients) {
     clients = wsClients;
 }
 
+function getCurrentQuoteData() {
+    return currentQuoteData;
+}
+
+function decrementQuoteLimit() {
+    if (quoteClickLimit > 0) {
+        quoteClickLimit--;
+    }
+    return quoteClickLimit;
+}
+
+function getCurrentQuoteLimit() {
+    return quoteClickLimit;
+}
+
 module.exports = {
-    quoteClickLimit,
-    currentQuoteData,
+    getCurrentQuoteLimit,
+    decrementQuoteLimit,
+    getCurrentQuoteData,
     broadcastQuote,
     getRandomQuote,
     loadQuotes,

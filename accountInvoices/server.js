@@ -12,7 +12,7 @@ const categoryRoutes = require('./routes/category');
 const squareRoutes = require('./routes/square');
 
 const app = express();
-const PORT = 1236;
+const PORT = 1234;
 const server = http.createServer(app);
 
 app.use(cors());
@@ -24,13 +24,13 @@ app.use('/quotes', quoteRoutes);
 app.use('/category', categoryRoutes);
 app.use('/api', squareRoutes);
 
-// WebSocket
-setupWebSocket(server);
 
 // Start
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
 
-quoteUtils.loadQuotes();
-quoteUtils.scheduleDailyReset();
+quoteUtils.loadQuotes().then(() => {
+    setupWebSocket(server);
+    quoteUtils.scheduleDailyReset();
+});

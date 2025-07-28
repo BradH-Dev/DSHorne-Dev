@@ -1,23 +1,36 @@
 const { WebSocketServer } = require('ws');
 const quoteUtils = require('./utils/quoteUtils');
 
-let clients = [];
-
 function setupWebSocket(server) {
     const wss = new WebSocketServer({ server });
 
     wss.on('connection', (ws) => {
-        clients.push(ws);
-        if (quoteUtils.currentQuoteData.quote) {
-            ws.send(JSON.stringify({ ...quoteUtils.currentQuoteData, limit: quoteUtils.quoteClickLimit }));
+        console.log('WebSocket client connected');
+
+        // Send quote when ready
+        function sendQuoteWhenReady() {
+            const quote = quoteUtils.getCurrentQuoteData();
+            if (quote?.quote?.trim()) {
+                console.log('Sending current quote to client:', quote);
+                ws.send(JSON.stringify({
+                    ...quote,
+                    limit: quoteUtils.getCurrentQuoteLimit()
+                }));
+            } else {
+                setTimeout(sendQuoteWhenReady, 200);
+            }
         }
 
-        ws.on('close', () => {
-            clients = clients.filter(client => client !== ws);
-        });
-    });
+        sendQuoteWhenReady();
 
-    quoteUtils.setClients(clients);
+        // Clean up and update client list
+        ws.on('close', () => {
+            console.log('Client disconnected');
+            quoteUtils.setClients([...wss.clients].filter(client => client.readyState === 1));
+        });
+
+        quoteUtils.setClients([...wss.clients].filter(client => client.readyState === 1));
+    });
 }
 
 module.exports = { setupWebSocket };

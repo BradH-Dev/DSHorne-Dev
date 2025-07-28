@@ -11,6 +11,7 @@ Thumbs.db
 *.tar
 *.zip
 *.pdf
+quote_click_log.txt
 
 # Backup
 backup.sql

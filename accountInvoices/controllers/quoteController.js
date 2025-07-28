@@ -1,11 +1,12 @@
 const quoteUtils = require('../utils/quoteUtils');
 
 exports.getNewQuote = (req, res) => {
-    if (quoteUtils.quoteClickLimit > 0) {
-        quoteUtils.quoteClickLimit--;
+    const newLimit = quoteUtils.decrementQuoteLimit();
+
+    if (newLimit > 0) {
         const newQuote = quoteUtils.getRandomQuote();
         quoteUtils.broadcastQuote(newQuote);
-        res.json({ message: 'New quote broadcasted', limit: quoteUtils.quoteClickLimit });
+        res.json({ message: 'New quote broadcasted', limit: newLimit });
     } else {
         res.status(429).json({ message: 'Daily limit reached', limit: 0 });
     }

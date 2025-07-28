@@ -124,7 +124,7 @@ async function insertRowsIntoGrid(items, orderData) {
             
             const details = itemDetails.objects.find(detail => detail.id === item.catalog_object_id);
             const newRow = table.insertRow(-1);
-
+            newRow.dataset.active = 'true';
 
             for (let i = 0; i < 8; i++) {
                 const cell = newRow.insertCell(i);
@@ -151,6 +151,7 @@ async function insertRowsIntoGrid(items, orderData) {
                         cell.contentEditable = "false";
                         cell.innerHTML = `$${totalPrice.toFixed(2)}`;
                         cell.dataset.rawPrice = totalPrice.toString();
+                        
                         break;
                     case 5:
                         cell.contentEditable = "true";
@@ -168,6 +169,7 @@ async function insertRowsIntoGrid(items, orderData) {
             }
         });
 
+
         // Optionally, add a Freight row if applicable
         if (orderData.service_charges[0]) {
             const freightInfo = orderData.service_charges[0].amount_money.amount;
@@ -178,6 +180,7 @@ async function insertRowsIntoGrid(items, orderData) {
             }
         }
 
+        updatePrices();
         updateTotal();
     } catch (error) {
         console.error('Error fetching batch item details:', error);
@@ -216,6 +219,7 @@ async function fetchItemDetailsBatch(catalogObjectIds) {
 
 function addFreightRow(freightRow, freightInfo) {
     for (let i = 0; i < 8; i++) {
+        freightRow.dataset.active = 'true';
         const cell = freightRow.insertCell(i);
         cell.contentEditable = "true";
         const freightPrice = freightInfo / 100;
@@ -492,6 +496,7 @@ async function fetchData(sku, rowIndex, attempt = 1) {
         method: 'POST',
         headers: {
             'Square-Version': '2024-05-15',
+            'Authorization': 'Bearer #',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -607,11 +612,11 @@ function donePopup(messageHeading, messageBody, buttonText) {
     const closeButton = document.getElementById("closeButton");
     closeButton.innerText = buttonText;
     closeButton.onclick = function(event) {
-        event.stopPropagation();  // ⛔️ Prevent from triggering outer click listener
+        event.stopPropagation(); 
         popup.style.display = "none";
     };
 
-    // ⏳ Delay to next tick so this doesn't instantly fire on same click
+
     setTimeout(() => {
         function handleClickOutside(event) {
             if (!popup.contains(event.target)) {

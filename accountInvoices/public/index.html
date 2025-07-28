@@ -295,28 +295,48 @@ body, html {
       hoverTooltip.style.opacity = 1;
     });
 
+    let socket;
 
-    const socket = new WebSocket('ws://' + window.location.hostname + ':1234');
+function connectWebSocket() {
+  socket = new WebSocket('ws://' + window.location.hostname + ':1234');
 
-    socket.onmessage = (event) => {
-  const data = JSON.parse(event.data);
+  socket.onopen = () => {
+    console.log('WebSocket connected');
+  };
 
-  if (data.quote) {
-    quoteDiv.textContent = `"${data.quote}"`;
-    nameDiv.innerHTML = `
-      <span style="font-size: 22px;">- ${data.speaker}</span>, 
-      "${data.name}" (${data.season})
-    `;
+  socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log('Incoming quote data:', data);
 
-    const formattedQuote = encodeURIComponent(`${data.quote}? :seinfeld ${data.name}`);
-    clipLinkDiv.innerHTML = `<a href="https://getyarn.io/yarn-find?text=${formattedQuote}" target="_blank">View clip</a>`;
-  }
+    if (data.quote) {
+      quoteDiv.textContent = `"${data.quote}"`;
+      nameDiv.innerHTML = `
+        <span style="font-size: 22px;">- ${data.speaker}</span>, 
+        "${data.name}" (${data.season})
+      `;
+      const formattedQuote = encodeURIComponent(`${data.quote}? :seinfeld ${data.name}`);
+      clipLinkDiv.innerHTML = `<a href="https://getyarn.io/yarn-find?text=${formattedQuote}" target="_blank">View clip</a>`;
+    }
 
-  if (data.limit !== undefined) {
-    currentLimit = data.limit;
-    updateButton();
-  }
-};
+    if (data.limit !== undefined) {
+      currentLimit = data.limit;
+      updateButton();
+    }
+  };
+
+  socket.onerror = (err) => {
+    console.error('WebSocket error:', err);
+    socket.close();
+  };
+
+  socket.onclose = () => {
+    console.warn('WebSocket closed, retrying in 3s...');
+    setTimeout(connectWebSocket, 3000);
+  };
+}
+
+connectWebSocket();
+
 
 const georgeisms = [
   "That's it! No more quote refreshes! You’re gonna have to wait until tomorrow, buddy.",
