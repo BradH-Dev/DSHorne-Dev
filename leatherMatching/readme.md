@@ -98,3 +98,6 @@ In order for automatic features to work, you must ensure that Square webhooks ar
 -   **Persistence:** Auto-save to JSON (no external DB required)
     
 -   **API:** Square API (secure, token-protected, never exposed to client)
+
+
+<img width="2654" height="1447" alt="image" src="https://github.com/user-attachments/assets/2af57d7e-36c4-4f49-8723-a2cc2f4e4fd2" />

@@ -5,6 +5,7 @@ A modern, browser-based application for generating Xero-compatible invoices and 
 This tool enables fast, accurate order lookup, custom CSV invoice creation, and real-time stock adjustment or recount, all in one workflow. It’s ideal for back-office staff or anyone handling account orders, bulk sales, or regular inventory corrections.
 
 ---
+# In order to use the tool you must specify a Square API auth token in an `.env` file.
 
 ## Overview
 
@@ -128,3 +129,7 @@ This tool enables fast, accurate order lookup, custom CSV invoice creation, and 
   Uses a WebSocket to fetch random Seinfeld quotes (or fallback list if not available).
 - **Category Mappings:**  
   See the `fetchCategoryDetails` function for how categories are mapped to Xero codes.
+
+<img width="2068" height="999" alt="image" src="https://github.com/user-attachments/assets/1f3e945c-c59d-490a-85d9-ec83f2291076" />
+<img width="2144" height="902" alt="image" src="https://github.com/user-attachments/assets/289b67ab-dda2-450e-bfd5-27f8a96101ca" />
+<img width="1231" height="1050" alt="image" src="https://github.com/user-attachments/assets/546551a3-b7bf-4a44-a192-1955368136bf" />
